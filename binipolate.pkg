@@ -1,0 +1,14 @@
+v 3
+
+d binipolate: bin data and interpolate percentiles
+d
+d Author: Economic Policy Institute
+d Support: https://github.com/Economic/binipolate
+d
+d binipolate bins the data and calculates linearlly interpolated percentiles as well as classical percentiles.
+d
+d Distribution-Date: 20181031
+d
+
+f binipolate.ado
+f binipolate.sthlp
