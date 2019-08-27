@@ -52,5 +52,5 @@ returns the median.
 
     {hline}
 {pstd}Calculate nominal wage percentiles by year and gender with the 2016-2017 EPI CPS ORG extracts{p_end}
-{phang2}{cmd:. append_extracts, begin(2016m1) end(2017m12) sample(org)}{p_end}
+{phang2}{cmd:. load_epiextracts, begin(2016m1) end(2017m12) sample(org)}{p_end}
 {phang2}{cmd:. binipolate wage if wage > 0 & wage ~= . [pw=orgwgt], binsize(0.25) percentiles(10 50 90) by(year female)}{p_end}
