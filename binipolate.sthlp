@@ -85,7 +85,7 @@ returns the median.
 {title:Examples}
 
     {hline}
-{pstd}Calculate nominal wage percentiles by year and gender with the 2016-2017 EPI CPS ORG extracts{p_end}
+{pstd}Calculate binned and classical medians:{p_end}
 {phang2}{cmd:. sysuse auto, clear}{p_end}
 {phang2}{cmd:. binipolate price, binsize(500) by(foreign) classical}{p_end}
 
