@@ -7,7 +7,7 @@ d Support: https://github.com/Economic/binipolate
 d
 d binipolate bins the data and calculates linearlly interpolated percentiles as well as classical percentiles.
 d
-d Distribution-Date: 20181031
+d Distribution-Date: 20190124
 d
 
 f binipolate.ado

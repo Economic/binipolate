@@ -9,7 +9,7 @@
 program define binipolate
 syntax varname(numeric) [if] [in] [fweight pweight], ///
 BINsize(real) ///
-[Percentiles(numlist >0 <100 int) by(varlist) collapsefun(string)]
+[Percentiles(numlist >0 <100 int) by(varlist) collapsefun(string) classical bgen(name) cgen(name) pgen(name)]
 
 * check bin size
 capture assert `binsize' > 0
@@ -52,24 +52,30 @@ else {
 if "`collapsefun'" ~= "" noi di _n "Using collapse function `collapsefun'" _n
 else local collapsefun collapse
 
-
+* identify names of new bin/percentile names 
+if "`bgen'" == "" local bgen `varlist'_binned
+if "`cgen'" == "" local cgen `varlist'_classical
+if "`pgen'" == "" local pgen percentile
 
 * calculate percentiles
 qui {
 
-	* calculate classical percentiles
-	* define collapse list
-	local collapselist ""
-	foreach perc of numlist `percentiles' {
-	  local collapselist `collapselist' (p`perc') p`perc'_classical = `varlist'
+	if "`classical'" != "" {
+		* calculate classical percentiles
+		* define collapse list
+		local collapselist ""
+		foreach perc of numlist `percentiles' {
+			local collapselist `collapselist' (p`perc') `cgen'`perc' = `varlist'
+		}
+		* collapse data
+		noi di "Calculating classical percentiles..."
+		preserve
+		`collapsefun' `collapselist' (first) `group' [`weight' = `w'] if `touse', by(`by')
+		reshape long `cgen', i(`group') j(`pgen')
+		tempfile classical
+		save `classical'
+		restore
 	}
-	* collapse data
-	noi di "Calculating classical percentiles..."
-	preserve
-	`collapsefun' `collapselist' (first) `group' [`weight' = `w'] if `touse', by(`by')
-	tempfile classical
-	save `classical'
-	restore
 
 	noi di "Calculating binned percentiles..."
 	* collapse data by bin
@@ -77,16 +83,24 @@ qui {
 	gen `binvalue' = floor((`varlist'-`binsize'/2)/`binsize')*`binsize'+ `binsize' + `binsize'/2
 	`collapsefun' (sum) `w' (first) `group' if `touse', by(`by' `binvalue')
 
+	* grab by-group mapping
+	preserve
+	`collapsefun' (first) `group', by(`by')
+	keep `group' `by'
+	tempfile bygroups
+	save `bygroups'
+	restore
+
 	tempvar runningsum totalsum cdf
 	bysort `by' (`binvalue'): gen `runningsum' = sum(`w')
 	egen `totalsum' = total(`w'), by(`by')
 	gen `cdf' = `runningsum' / `totalsum'
 
 	* initialize postfile for results
-	tempname memhold percentile
+	tempname memhold
 	tempfile results
 	local binnedoutputnames ""
-	postfile `memhold' `group' `percentile' p_binned using `results'
+	postfile `memhold' `group' `pgen' `bgen' using `results'
 
 	* crucial that this is sorted
 	sort `group' `binvalue'
@@ -103,9 +117,11 @@ qui {
 		}
 	}
 	postclose `memhold'
+
 	use `results', clear
-	reshape wide p@_binned, i(`group') j(`percentile')
-	merge 1:1 `group' using `classical', assert(3) nogenerate
+	* merge bygroup mapping
+	merge m:1 `group' using `bygroups', assert(3) nogenerate
+	if "`classical'" != "" merge 1:1 `group' `pgen' using `classical', assert(3) nogenerate
 	sort `by'
 	order `by'
 }
