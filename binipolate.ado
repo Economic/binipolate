@@ -9,7 +9,7 @@
 program define binipolate
 syntax varname(numeric) [if] [in] [fweight pweight], ///
 BINsize(real) ///
-[Percentiles(numlist >0 <100 int) by(varlist) collapsefun(string) classical bgen(name) cgen(name) pgen(name)]
+[Percentiles(numlist >0 <100 int) by(varlist) collapsefun(string) wide classical bgen(name) cgen(name) pgen(name)]
 
 * check bin size
 capture assert `binsize' > 0
@@ -124,6 +124,10 @@ qui {
 	if "`classical'" != "" merge 1:1 `group' `pgen' using `classical', assert(3) nogenerate
 	sort `by'
 	order `by'
+}
+
+if "`wide'" != "" {
+	reshape wide `bgen', i(`group') j(`pgen')
 }
 
 end
