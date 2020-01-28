@@ -127,7 +127,7 @@ qui {
 }
 
 if "`wide'" != "" {
-	reshape wide `bgen', i(`group') j(`pgen')
+	qui reshape wide `bgen' `pgen', i(`group') j(`pgen')
 }
 
 end
