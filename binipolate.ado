@@ -72,8 +72,8 @@ qui {
 		preserve
 		`collapsefun' `collapselist' (first) `group' [`weight' = `w'] if `touse', by(`by')
 		reshape long `cgen', i(`group') j(`pgen')
-		tempfile classical
-		save `classical'
+		tempfile classical_data
+		save `classical_data'
 		restore
 	}
 
@@ -121,13 +121,16 @@ qui {
 	use `results', clear
 	* merge bygroup mapping
 	merge m:1 `group' using `bygroups', assert(3) nogenerate
-	if "`classical'" != "" merge 1:1 `group' `pgen' using `classical', assert(3) nogenerate
+	if "`classical'" != "" merge 1:1 `group' `pgen' using `classical_data', assert(3) nogenerate
 	sort `by'
 	order `by'
 }
 
 if "`wide'" != "" {
-	qui reshape wide `bgen' `pgen', i(`group') j(`pgen')
+	qui {
+		if "`classical'" != "" reshape wide `bgen' `cgen', i(`group') j(`pgen')
+		else reshape wide `bgen', i(`group') j(`pgen')
+	}
 }
 
 end
