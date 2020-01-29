@@ -28,6 +28,7 @@ This command replaces the dataset in memory with a dataset containing linearly i
 {cmdab:p:ercentiles(}{it:numlist}{cmd:)}
 {cmd:by(}{it:varlist}{cmd:)}
 {opt collapsefun(function)}
+{opt wide}
 {opt classical}
 {opt bgen(newvar)}
 {opt cgen(newvar)}
@@ -46,6 +47,8 @@ where {cmdab:b:insize(}{it:sizeofbin}{cmd:)} is the desired size of the bins.
 {synopt :{opth percentiles(numlist)}}list of percentiles as percentages; default is 50 (the median).
 {p_end}
 {synopt :{opth by(varlist)}}groups over percentiles are to be calculated.
+{p_end}
+{synopt :{opt wide}}reshape output to wide format; default is long
 {p_end}
 {synopt :{opt classical}}also calculate classical (non-binned) percentiles.
 {p_end}
